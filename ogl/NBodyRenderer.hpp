@@ -6,8 +6,8 @@
 #include <iostream>
 #include <thread>
 
-// Include GLEW
-#include <GL/glew.h>
+// Include glad
+#include <glad/glad.h>
 
 // Include GLFW
 #include <GLFW/glfw3.h>

@@ -12,7 +12,6 @@
 
 #include "NBodyKeys.h"
 #include "NBodyOctree.h"
-#include "NBodyParallel.h"
 
 #if NBODY_SIM_WITH_RENDERER
 #include "ogl/NBodyRenderer.hpp"
@@ -23,8 +22,10 @@
 int ExecutorThreadPool::maxThreads = NBODY_NPROCS;
 #endif
 
+#define WITH_TIMING 0
+#if WITH_TIMING
 #include "Unix_Timer.h"
-
+#endif
 
 
 void NBodySimSerial(long N, double dt, double t_end, time_t seed, double theta) {

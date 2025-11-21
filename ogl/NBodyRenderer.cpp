@@ -412,14 +412,21 @@ int NBodyRenderer::OGL_setup() {
 		glfwSwapInterval(2);
 	}
 
-	// Initialize GLEW
-	glewExperimental = true; // Needed for core profile
-	if (glewInit() != GLEW_OK) {
-		fprintf(stderr, "Failed to initialize GLEW\n");
-		getchar();
-		glfwTerminate();
+
+	// glad: load all OpenGL function pointers
+	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
+		std::cout << "Failed to initialize GLAD" << std::endl;
 		return -1;
 	}
+	//
+	// // Initialize GLEW
+	// glewExperimental = true; // Needed for core profile
+	// if (glewInit() != GLEW_OK) {
+	// 	fprintf(stderr, "Failed to initialize GLEW\n");
+	// 	getchar();
+	// 	glfwTerminate();
+	// 	return -1;
+	// }
 
 	// Ensure we can capture the escape key being pressed below
 	// glfwSetInputMode(window, GLFW_STICKY_KEYS, GL_TRUE);

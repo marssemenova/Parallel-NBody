@@ -16,7 +16,7 @@
  * Main method to get command line args and start and the NBody sim.
  */
 int main(int argc, char** argv) {
-    long N = 10;
+    long N = 1000;
     double dt = 0.01;
     double t_end = 10.0;
     time_t seed = 0;

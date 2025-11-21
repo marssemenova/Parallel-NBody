@@ -3,6 +3,8 @@
 #ifndef _NBODY_SIMULTATION_
 #define _NBODY_SIMULTATION_
 
+#include <ctime>
+
 /**
  * Start the gravitational N-Body simultation in serial.
  *
