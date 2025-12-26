@@ -611,7 +611,7 @@ int NBodyRenderer::draw() {
 	if (tree != NULL) {
 		tree->draw();
 	}
-	plane.draw();
+	plane.draw(V, Projection);
 	ax.draw(V, Projection);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	while((err = glGetError()) != GL_NO_ERROR)

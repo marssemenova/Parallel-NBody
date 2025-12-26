@@ -12,6 +12,7 @@ class Axes { // TODO: make sure nothing that shouldn't be exposed is exposed
 	glm::vec3 origin;
 	glm::vec3 extents;
 	bool includeNeg;
+	int numVerts;
 
 	float endcapSize = 0.075;
 	glm::vec4 xcol = glm::vec4(1.0f, 0.0f, 0.0f, 0.15f);
@@ -37,15 +38,65 @@ class Axes { // TODO: make sure nothing that shouldn't be exposed is exposed
 		static const GLfloat verts[] = {
 			origin.x, origin.y, origin.z,
 			origin.x + extents.x, origin.y, origin.z,
+			origin.x + extents.x, origin.y, origin.z,
+			origin.x + extents.x, origin.y, origin.z+endcapSize,
+			origin.x + extents.x, origin.y, origin.z,
+			origin.x + extents.x, origin.y, origin.z-endcapSize,
+
 			origin.x, origin.y, origin.z,
 			origin.x, origin.y + extents.y, origin.z,
+			origin.x, origin.y + extents.y, origin.z,
+			origin.x, origin.y + extents.y, origin.z+endcapSize,
+			origin.x, origin.y + extents.y, origin.z,
+			origin.x, origin.y + extents.y, origin.z-endcapSize,
+
 			origin.x, origin.y, origin.z,
 			origin.x, origin.y, origin.z + extents.z,
+			origin.x, origin.y, origin.z + extents.z,
+			origin.x+endcapSize, origin.y, origin.z + extents.z,
+			origin.x, origin.y, origin.z + extents.z,
+			origin.x-endcapSize, origin.y, origin.z + extents.z
 		};
+
+		GLfloat *mergedVerts;
+		if (includeNeg) {
+			static const GLfloat vertsNeg[] = {
+				origin.x, origin.y, origin.z,
+				origin.x - extents.x, origin.y, origin.z,
+				origin.x - extents.x, origin.y, origin.z,
+				origin.x - extents.x, origin.y, origin.z+endcapSize,
+				origin.x - extents.x, origin.y, origin.z,
+				origin.x - extents.x, origin.y, origin.z-endcapSize,
+
+				origin.x, origin.y, origin.z,
+				origin.x, origin.y - extents.y, origin.z,
+				origin.x, origin.y - extents.y, origin.z,
+				origin.x, origin.y - extents.y, origin.z+endcapSize,
+				origin.x, origin.y - extents.y, origin.z,
+				origin.x, origin.y - extents.y, origin.z-endcapSize,
+
+				origin.x, origin.y, origin.z,
+				origin.x, origin.y, origin.z - extents.z,
+				origin.x, origin.y, origin.z - extents.z,
+				origin.x+endcapSize, origin.y, origin.z - extents.z,
+				origin.x, origin.y, origin.z - extents.z,
+				origin.x-endcapSize, origin.y, origin.z - extents.z
+			};
+
+			mergedVerts = (GLfloat*)malloc(sizeof(GLfloat) * sizeof(verts) * 2);
+			memcpy(mergedVerts, verts, sizeof(GLfloat) * sizeof(verts));
+			memcpy(mergedVerts + sizeof(verts), vertsNeg, sizeof(GLfloat) * sizeof(verts));
+		}
 
 		glGenBuffers(1, &vertBuffer);
 		glBindBuffer(GL_ARRAY_BUFFER, vertBuffer);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(verts), verts, GL_STATIC_DRAW);
+		GLint numCoords = includeNeg ? sizeof(verts) * 2 : sizeof(verts); // TODO
+		numVerts = numCoords / 3;
+		if (includeNeg) {
+			glBufferData(GL_ARRAY_BUFFER, numCoords, mergedVerts, GL_STATIC_DRAW);
+		} else {
+			glBufferData(GL_ARRAY_BUFFER, numCoords, verts, GL_STATIC_DRAW);
+		}
 		glEnableVertexAttribArray(0);
 		glVertexAttribPointer(
 			0,                                // attribute. No particular reason for 1, but must match the layout in the shader.
@@ -57,18 +108,48 @@ class Axes { // TODO: make sure nothing that shouldn't be exposed is exposed
 		);
 
 		// colours
-		static const GLfloat colours[] = {
-			xcol.x, xcol.y, xcol.z, xcol.a,
-			xcol.x, xcol.y, xcol.z, xcol.a,
-			ycol.x, ycol.y, ycol.z, ycol.a,
-			ycol.x, ycol.y, ycol.z, ycol.a,
-			zcol.x, zcol.y, zcol.z, zcol.a,
-			zcol.x, zcol.y, zcol.z, zcol.a,
-		};
+		GLint numColourInds = numVerts * 4;
+		GLfloat *colours = (GLfloat*)malloc(sizeof(GLfloat) * numColourInds);
+
+		for (int x = 0; x < 6; x++) { // x colours
+			for (int i = 0; i < 4; i++) {
+				colours[x + i] = xcol[i];
+			}
+
+			if (includeNeg) {
+				for (int i = 0; i < 4; i++) {
+					colours[x + i + numColourInds/2] = negxcol[i];
+				}
+			}
+		}
+
+		for (int x = 6; x < 12; x++) { // y colours
+			for (int i = 0; i < 4; i++) {
+				colours[x + i] = ycol[i];
+			}
+
+			if (includeNeg) {
+				for (int i = 0; i < 4; i++) {
+					colours[x + i + numColourInds/2] = negycol[i];
+				}
+			}
+		}
+
+		for (int x = 12; x < 18; x++) { // y colours
+			for (int i = 0; i < 4; i++) {
+				colours[x + i] = zcol[i];
+			}
+
+			if (includeNeg) {
+				for (int i = 0; i < 4; i++) {
+					colours[x + i + numColourInds/2] = negzcol[i];
+				}
+			}
+		}
 
 		glGenBuffers(1, &colorBuffer);
 		glBindBuffer(GL_ARRAY_BUFFER, colorBuffer);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(colours), colours, GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, numColourInds, colours, GL_STATIC_DRAW);
 		glEnableVertexAttribArray(1);
 		glVertexAttribPointer(
 			1,                                // attribute. No particular reason for 1, but must match the layout in the shader.
@@ -116,63 +197,7 @@ public:
 	/**
 	 * Draw the axes.
 	 */
-	void draw(glm::mat4 V, glm::mat4 P) { // TODO: consolidate the changes between legacy + modern code (e.g. drawing a pt (?), endcapSize), need M var?
-		/*
-		glColor4f(xcol.x, xcol.y, xcol.z, xcol.a);
-		glVertex3f(origin.x, origin.y, origin.z);
-		glVertex3f(origin.x + extents.x, origin.y, origin.z);
-		glVertex3f(origin.x + extents.x, origin.y, origin.z);
-		glVertex3f(origin.x + extents.x, origin.y, origin.z+endcapSize);
-		glVertex3f(origin.x + extents.x, origin.y, origin.z);
-		glVertex3f(origin.x + extents.x, origin.y, origin.z-endcapSize);
-
-		if (includeNeg) {
-			glColor4f(negxcol.x, negxcol.y, negxcol.z, negxcol.a);
-			glVertex3f(origin.x, origin.y, origin.z);
-			glVertex3f(origin.x - extents.x, origin.y, origin.z);
-			glVertex3f(origin.x - extents.x, origin.y, origin.z);
-			glVertex3f(origin.x - extents.x, origin.y, origin.z+endcapSize);
-			glVertex3f(origin.x - extents.x, origin.y, origin.z);
-			glVertex3f(origin.x - extents.x, origin.y, origin.z-endcapSize);
-		}
-
-		glColor4f(ycol.x, ycol.y, ycol.z, ycol.a);
-		glVertex3f(origin.x, origin.y, origin.z);
-		glVertex3f(origin.x, origin.y + extents.y, origin.z);
-		glVertex3f(origin.x, origin.y + extents.y, origin.z);
-		glVertex3f(origin.x, origin.y + extents.y, origin.z+endcapSize);
-		glVertex3f(origin.x, origin.y + extents.y, origin.z);
-		glVertex3f(origin.x, origin.y + extents.y, origin.z-endcapSize);
-
-		if (includeNeg) {
-			glColor4f(negycol.x, negycol.y, negycol.z, negycol.a);
-			glVertex3f(origin.x, origin.y, origin.z);
-			glVertex3f(origin.x, origin.y - extents.y, origin.z);
-			glVertex3f(origin.x, origin.y - extents.y, origin.z);
-			glVertex3f(origin.x, origin.y - extents.y, origin.z+endcapSize);
-			glVertex3f(origin.x, origin.y - extents.y, origin.z);
-			glVertex3f(origin.x, origin.y - extents.y, origin.z-endcapSize);
-		}
-
-		glColor4f(zcol.x, zcol.y, zcol.z, zcol.a);
-		glVertex3f(origin.x, origin.y, origin.z);
-		glVertex3f(origin.x, origin.y, origin.z + extents.z);
-		glVertex3f(origin.x, origin.y, origin.z + extents.z);
-		glVertex3f(origin.x+endcapSize, origin.y, origin.z + extents.z);
-		glVertex3f(origin.x, origin.y, origin.z + extents.z);
-		glVertex3f(origin.x-endcapSize, origin.y, origin.z + extents.z);
-
-		if (includeNeg) {
-			glColor4f(negzcol.x, negzcol.y, negzcol.z, negzcol.a);
-			glVertex3f(origin.x, origin.y, origin.z);
-			glVertex3f(origin.x, origin.y, origin.z - extents.z);
-			glVertex3f(origin.x, origin.y, origin.z - extents.z);
-			glVertex3f(origin.x+endcapSize, origin.y, origin.z - extents.z);
-			glVertex3f(origin.x, origin.y, origin.z - extents.z);
-			glVertex3f(origin.x-endcapSize, origin.y, origin.z - extents.z);
-		}
-		*/
-
+	void draw(glm::mat4 V, glm::mat4 P) { // TODO: verify the changes between legacy + modern code (e.g. drawing a pt (?), endcapSize), need M var?
 		glm::mat4 MVP = P*V; // TODO: *M?
 		glBindVertexArray(vertexArrayID);
 		glUseProgram(programID);
@@ -180,7 +205,7 @@ public:
 		glUniformMatrix4fv(MVPID, 1, GL_FALSE, &MVP[0][0]);
 
 		glLineWidth(3.0f);
-		glDrawArrays(GL_LINES, 0, 6);
+		glDrawArrays(GL_LINES, 0, numVerts);
 		glLineWidth(1.0f);
 
 		glUseProgram(0);
