@@ -495,15 +495,6 @@ int NBodyRenderer::draw() {
 
 	GLenum err;
 
-	glMatrixMode(GL_PROJECTION);
-	glPushMatrix();
-	glLoadMatrixf(glm::value_ptr(Projection));
-
-	glMatrixMode( GL_MODELVIEW );
-	glPushMatrix();
-	glLoadMatrixf(glm::value_ptr(V)); //load view only so that axes are at origin.
-
-
 	/////////////////////////////////////////////////////////////////
 	// Forward pass 1
 	/////////////////////////////////////////////////////////////////
@@ -621,7 +612,7 @@ int NBodyRenderer::draw() {
 		tree->draw();
 	}
 	plane.draw();
-	ax.draw();
+	ax.draw(V, Projection);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	while((err = glGetError()) != GL_NO_ERROR)
 	{
@@ -680,13 +671,6 @@ int NBodyRenderer::draw() {
 	{
 		fprintf(stderr, "Render From Texture Error: %d\n", err);
 	}
-
-	glMatrixMode(GL_MODELVIEW);
-	glPopMatrix();
-
-	glMatrixMode(GL_PROJECTION);
-	glPopMatrix();
-
 
 	// Swap buffers
 	glfwSwapBuffers(window);

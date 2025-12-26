@@ -27,6 +27,7 @@ class OGLOctree {
 			return;
 		}
 
+		/* TODO: refactor to modern OGL
 		float xmax = node->center[0] + node->size;
 		float xmin = node->center[0] - node->size;
 		float ymax = node->center[1] + node->size;
@@ -71,6 +72,7 @@ class OGLOctree {
 				renderNode(node->children[i]);
 			}
 		}
+		*/
 
 	}
 
@@ -139,18 +141,7 @@ public:
 			return;
 		}
 
-		glMatrixMode( GL_MODELVIEW );
-		glPushMatrix();
-
-
-		glEnable(GL_LINE_SMOOTH);
-		glEnable(GL_BLEND);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-		glEnable(GL_DEPTH_TEST);
-		// Accept fragment if it closer to the camera than the former one
-		glDepthFunc(GL_LESS);
-
+		/* TODO: refactor to modern OGL
 		glLineWidth(1.0f);
 		glColor4f(color.x, color.y, color.z, color.a);
 
@@ -161,12 +152,7 @@ public:
 			}
 			glEnd();
 		}
-
-		glPopMatrix();
-
-		glDisable(GL_DEPTH_TEST);
-		glDisable(GL_LINE_SMOOTH);
-		glDisable(GL_BLEND);
+		*/
 	}
 
 };

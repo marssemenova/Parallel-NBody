@@ -64,28 +64,14 @@ public:
 	 * @param softEdge_in, if true, edges of the plane fade to 0 opacity.
 	 * @param gridOnly_in, if true, only the grid lines are drawn and not the plane itself.
 	 */
-	Plane(GLfloat sz, bool softEdge_in, bool gridOnly_in) :
-		size(sz),
-		softEdge(softEdge_in),
-		gridOnly(gridOnly_in)
-	{
-
-	}
+	Plane(GLfloat sz, bool softEdge_in, bool gridOnly_in) : size(sz), softEdge(softEdge_in), gridOnly(gridOnly_in) {}
 
 
 	/**
 	 * Draw the plane.
 	 */
 	void draw() {
-
-		glMatrixMode(GL_MODELVIEW);
-		glPushMatrix();
-
-		glEnable(GL_LINE_SMOOTH);
-		glEnable(GL_POLYGON_SMOOTH);
-		glEnable(GL_BLEND);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
+/*
 		if (plane == PLANE_WHICH::x) {
 			if (!gridOnly) {
 				glBegin(GL_QUADS);
@@ -137,13 +123,8 @@ public:
 				}
 			}
 			glEnd();
-
 		}
-
-		glPopMatrix();
-		glDisable(GL_BLEND);
-		glDisable(GL_LINE_SMOOTH);
-		glDisable(GL_POLYGON_SMOOTH);
+	*/
 	}
 
 };

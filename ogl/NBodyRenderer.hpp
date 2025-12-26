@@ -147,9 +147,7 @@ public :
 		vsync(do_vsync),
 		init(false),
 		close(false)
-	{
-
-	}
+	{}
 
 
 	/**
@@ -284,9 +282,6 @@ public :
 	bool needsUpdate() {
 		return points.pointsStale();
 	}
-
 };
-
-
 
 #endif

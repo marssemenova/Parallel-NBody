@@ -92,7 +92,9 @@ void NBodySimSerial(long N, double dt, double t_end, time_t seed, double theta) 
     double dt_out = 0.1;
     double t_out = dt_out;
     unsigned long long startTimer;
+#if WITH_TIMING
     _startTimerParallel(&startTimer);
+#endif
     for (double t = 0.0; t < t_end; t += dt) {
 #if NBODY_SIM_WITH_RENDERER
         if (renderer.shouldClose()) {
@@ -136,8 +138,9 @@ void NBodySimSerial(long N, double dt, double t_end, time_t seed, double theta) 
     }
 
     float elapsed = 0.0;
+#if WITH_TIMING
     _stopTimerAddElapsedParallel(&startTimer, &elapsed);
-
+#endif
     Epot = computeEpot_NB(N, m, r);
     Ekin = computeEkin_NB(N, m, v);
     E0 = Epot + Ekin;
